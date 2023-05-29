@@ -21,10 +21,12 @@ public class GameView extends View {
     Runnable runnable;
     final int UPDATE_MILLIS=30;
     boolean dead = false;
+    boolean zero = true;
     double travelled = 0;
     int tubeCount = 0;
     Bitmap background;
     Bitmap topTube, bottomTube;
+    Bitmap topTube2, bottomTube2;
     Display display;
     Point point;
     int dWidth, dHeight; //device width and height
@@ -39,15 +41,15 @@ public class GameView extends View {
     int minTubeOffset, maxTubeOffset;
     int numberOfTubes  = 1;
     int distanceBetweenTubes;
-    int tubeX;
-    int topTubeY;
+    int tubeX, tube2X;
+    int topTubeY, topTube2Y;
     Random random;
     int tubeVelocity = 8;
 
     public void generateTube(){
         topTube = BitmapFactory.decodeResource(getResources(), R.drawable.top_tube);
         bottomTube = BitmapFactory.decodeResource(getResources(), R.drawable.bot_tube);
-        tubeX = dWidth + tubeCount++ * distanceBetweenTubes;
+        tubeX = dWidth;
         topTubeY = minTubeOffset + random.nextInt(maxTubeOffset - minTubeOffset + 1);
     }
     public GameView(Context context) {
@@ -112,23 +114,37 @@ public class GameView extends View {
                 }
 
 
+                //if(!(travelled >= 20 && icee[iceframe].getHeight() + 285 < topTubeY && icee[iceframe].getHeight() > topTubeY - gap)) dead = !dead;
 
-                for(int i = 0; i < numberOfTubes; i++){
-                    travelled += tubeVelocity/1000.0;
-                    tubeX -= tubeVelocity;
-                    canvas.drawBitmap(topTube, tubeX, topTubeY - topTube.getHeight(), null);
-                    canvas.drawBitmap(bottomTube, tubeX, topTubeY + gap, null);
-                    System.out.println(travelled);
-                }
-
-                if(travelled >= 0.75){
+                if(travelled >= 0.50){
                     tubeCount++;
                     travelled = 0;
+
+                    topTube2 = topTube;
+                    bottomTube2 = bottomTube;
+                    zero = !zero;
                     generateTube();
                 }
+
+                tubeX -= tubeVelocity;
+                canvas.drawBitmap(topTube, tubeX, topTubeY - topTube.getHeight(), null);
+                canvas.drawBitmap(bottomTube, tubeX, topTubeY + gap, null);
+
+                if(!zero){
+                    tube2X -= tubeVelocity;
+                    canvas.drawBitmap(topTube2, tube2X, topTube2Y - topTube2.getHeight(), null);
+                    canvas.drawBitmap(bottomTube2, tube2X, topTube2Y + gap, null);
+                }
+
+
+                travelled += tubeVelocity/1000.0;
+                System.out.println(travelled);
             }
 
+
             handler.postDelayed(runnable, UPDATE_MILLIS);
+
+
         }
         else {
 
